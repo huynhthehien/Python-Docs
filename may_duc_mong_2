@@ -6,15 +6,16 @@
            CLK-                    GND
            CW-                     GND
            EN-                     GND
-
+			Relay					6
   A+ A- B+ B- kết nối với động cơ
 
   Điện áp hoạt động: 10-35VDC.
  */
-
+const int step = 5;  //so xung cho moi buoc
 const int stepPin = 5; 
 const int dirPin = 2; 
 const int enPin = 8;
+const int Relay = 6;
 int switchArray[5]={A1, A2, A3, A4, A5};  //   S2,S1,S4, button, S3 
 int switchStateArray[5];
 int val;                         // đọc trạng thái pin
@@ -25,8 +26,7 @@ void setup() {
   pinMode(dirPin,OUTPUT);
   pinMode(enPin,OUTPUT);
   digitalWrite(enPin,LOW);
-//  pinMode(button_on_off, INPUT);
-//  buttonState = digitalRead(switch);   
+  pinMode(Relay,OUTPUT);
   for(int i=0; i<5;i++)
   {
   pinMode(switchArray[i], INPUT);    
@@ -56,21 +56,30 @@ void update_button_state(){
   Serial.println("Updated!!!!");
 }
 void reset(){
-  while(digitalRead(switchArray[3])==LOW)
+  while(digitalRead(switchArray[3])==LOW) //S3 != HIGH
   {
     motor_backwork(10);
-    update_button_state();
+//    update_button_state();
   }
+  Serial.println("Reset done!");
 }
 void motor_backwork(int step)
 {
   digitalWrite(dirPin,HIGH); // Enables the motor to move in a particular direction
   // Makes 200 pulses for making one full cycle rotation
   for(int x = 0; x < step; x++) {
+	if(digitalRead(switchArray[4])==HIGH)
+	{
+		delay(50);
+		if(digitalRead(switchArray[4]==HIGH)
+		{
+			break;
+		}
+	}
     digitalWrite(stepPin,HIGH); 
     delayMicroseconds(500); 
     digitalWrite(stepPin,LOW); 
-    delayMicroseconds(500); 
+    delayMicroseconds(500);
   }
 }
 void motor_forwork(int step)
@@ -78,6 +87,14 @@ void motor_forwork(int step)
   digitalWrite(dirPin,LOW); //Changes the rotations direction
   // Makes 200 pulses for making one full cycle rotation
   for(int x = 0; x < step; x++) {
+	if(digitalRead(switchArray[2])==HIGH)
+	{
+		delay(50);
+		if(digitalRead(switchArray[2]==HIGH)
+		{
+			break;
+		}
+	}
     digitalWrite(stepPin,HIGH); 
     delayMicroseconds(500); 
     digitalWrite(stepPin,LOW); 
@@ -86,6 +103,35 @@ void motor_forwork(int step)
 }
 
 void loop() {
+  reset();
+  if(digitalRead(switchArray[3]==HIGH)
+  {
+	while(digitalRead(switchArray[2])==LOW) //S4 ==LOW ?
+	{
+		motor_forwork(step);
+		//S1 must be HIGH
+		digitalWrite(Relay,HIGH);
+		delay(500);
+		while(digitalRead(switchArray[0])==LOW)
+		{
+		}
+		Serial.println("S2 on");
+		while(digitalRead(switchArray[1]==LOW)
+		{
+		}
+		Serial.println("S1 on");
+	}
+	while(digitalRead(switchArray[4]==LOW) //S3==LOW?
+	{
+		motor_backwork(step);
+	}
+	while(digitalRead(switchArray[3]==HIGH)
+	{
+	}
+  }
+
+
+
   /*
  while(1){
   for(int i=0;i<5;i++)
@@ -97,7 +143,7 @@ void loop() {
   delay(1000);
  }
  */
-  reset();
+
 /*  digitalWrite(dirPin,HIGH); // Enables the motor to move in a particular direction
   // Makes 200 pulses for making one full cycle rotation
   for(int x = 0; x < 800; x++) {
